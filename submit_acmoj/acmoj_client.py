@@ -2,21 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 ACMOJ API Client Command Line Tool - C++ File Submission Version v2.2
-
-Usage Examples:
-1. Submit C++ source file:
-   python3 acmoj_client.py --token ${ACMOJ_TOKEN} submit --problem-id ${ACMOJ_PROBLEM_ID} --language cpp --code-file .cpp/.hpp/.h
-   The returned result contains submission_id information, please save it for subsequent status queries
-
-2. Query submission status:
-   python3 acmoj_client.py --token ${ACMOJ_TOKEN} status --submission-id <your_submission_id>
-   Note: Evaluation takes time, it's recommended to wait 10 seconds before querying status
-   For example, if the returned result shows "status": "compiling" or "status": "pending", 
-   it means the evaluation is still in progress or queued, please check again later
-
-3. Abort submission:
-   python3 acmoj_client.py --token ${ACMOJ_TOKEN} abort --submission-id <your_submission_id>
-   Abort the evaluation of the specified submission
 """
 
 import requests
@@ -43,9 +28,11 @@ class ACMOJClient:
         url = f"{self.api_base}{endpoint}"
         try:
             if method.upper() == "GET":
-                response = requests.get(url, headers=self.headers, params=params, timeout=10, proxies={"https": None, "http": None})
+                response = requests.get(url, headers=self.headers, params=params, timeout=10,
+                                        proxies={"https": None, "http": None})
             elif method.upper() == "POST":
-                response = requests.post(url, headers=self.headers, data=data, timeout=10, proxies={"https": None, "http": None})
+                response = requests.post(url, headers=self.headers, data=data, timeout=10,
+                                         proxies={"https": None, "http": None})
             else:
                 print(f"Unsupported HTTP method: {method}")
                 return None
@@ -77,8 +64,7 @@ class ACMOJClient:
             }
 
             with open(self.submission_log_file, 'a') as f:
-                f.write(json.dumps(log_entry) + '
-')
+                f.write(json.dumps(log_entry) + "\n")
 
             print(f"✅ Submission ID {submission_id} saved to {self.submission_log_file}")
         except Exception as e:
@@ -89,6 +75,7 @@ class ACMOJClient:
         result = self._make_request("POST", f"/problem/{problem_id}/submit", data=data)
         if result and 'id' in result:
             self._save_submission_id(result['id'])
+
         return result
 
     def submit_code(self, problem_id: int, language: str, code_text: str) -> Optional[Dict]:
